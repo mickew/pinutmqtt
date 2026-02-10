@@ -1,0 +1,14 @@
+[Unit]
+Description=MQTT nut UPS Client systemd demon
+
+[Service]
+WorkingDirectory=/usr/local/bin/pinutmqtt
+ExecStart=/usr/local/bin/pinutmqtt/Pinutmqtt
+Restart=always
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=pinutmqtt
+Environment=NETCORE_ENVIRONMENT=Production
+
+[Install]
+WantedBy=multi-user.target

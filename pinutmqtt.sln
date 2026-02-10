@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11415.280 d18.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pinutmqtt", "pinutmqtt\Pinutmqtt.csproj", "{C8557FBA-36FF-4E16-8D72-2E648CB77CC1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7C640DB9-394C-4CFC-9A01-56A7A7E2A601}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		build-suffix.props = build-suffix.props
+		Directory.Build.props = Directory.Build.props
+		README.md = README.md
+		version.props = version.props
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUTDotNetShared", "NUTDotNetShared\NUTDotNetShared.csproj", "{BD0F1C87-AFA6-E0FB-A611-785128362019}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUTDotNetClient", "NUTDotNetClient\NUTDotNetClient.csproj", "{81B962AF-E46E-9A7D-C91F-21C3F202336D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C8557FBA-36FF-4E16-8D72-2E648CB77CC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8557FBA-36FF-4E16-8D72-2E648CB77CC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8557FBA-36FF-4E16-8D72-2E648CB77CC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8557FBA-36FF-4E16-8D72-2E648CB77CC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD0F1C87-AFA6-E0FB-A611-785128362019}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD0F1C87-AFA6-E0FB-A611-785128362019}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD0F1C87-AFA6-E0FB-A611-785128362019}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD0F1C87-AFA6-E0FB-A611-785128362019}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81B962AF-E46E-9A7D-C91F-21C3F202336D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81B962AF-E46E-9A7D-C91F-21C3F202336D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81B962AF-E46E-9A7D-C91F-21C3F202336D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81B962AF-E46E-9A7D-C91F-21C3F202336D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {74EA3FFC-7C96-461C-B77E-CA481DB33B9A}
+	EndGlobalSection
+EndGlobal
