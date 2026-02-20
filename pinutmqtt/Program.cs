@@ -3,7 +3,10 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Pinutmqtt.Jobs;
+using Pinutmqtt.Models;
 using Pinutmqtt.Services;
+using Quartz;
 using Serilog;
 
 const string VersionArgs = "--version";
@@ -34,6 +37,16 @@ HostApplicationBuilder builder = Host.CreateApplicationBuilder(settings);
 
 Log.ForContext<Program>().Information("Starting Pinutmqtt {Version}", GetVersion());
 
+builder.Services.AddOptions<NutSettings>()
+    .Bind(builder.Configuration.GetSection(NutSettings.Section))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddOptions<MqttSettings>()
+    .BindConfiguration(MqttSettings.Section)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
 builder.Services.AddSerilog((services, configuration) =>
 {
     configuration
@@ -45,6 +58,31 @@ builder.Services.AddSerilog((services, configuration) =>
 });
 
 builder.Services.AddSingleton<INutUPSClientService, NutUPSClientService>();
+builder.Services.AddSingleton<IHostedService>(serviceProvider => serviceProvider.GetService<INutUPSClientService>()!);
+builder.Services.AddSingleton<IMqttClientService, MqttClientService>();
+builder.Services.AddSingleton<IHostedService>(serviceProvider => serviceProvider.GetService<IMqttClientService>()!);
+
+var everySeconds = builder.Configuration.GetValue<int?>("UPSReadIntervalSeconds") ?? 30;
+
+
+builder.Services.AddQuartz(options =>
+{
+    var jobKey = new JobKey(nameof(GetUPSStatusJob));
+    options
+        .AddJob<GetUPSStatusJob>(jobKey, (IJobConfigurator job) => { }) // Explicitly specify the delegate type
+        .AddTrigger(trigger =>
+            trigger
+                .ForJob(jobKey)
+                .WithSimpleSchedule(schedule =>
+                    schedule.WithInterval(TimeSpan.FromSeconds(everySeconds)).RepeatForever()));
+});
+
+builder.Services.AddQuartzHostedService(options =>
+{
+    options.WaitForJobsToComplete = true;
+});
+
+
 
 IHost host = builder.Build();
 await host.RunAsync();

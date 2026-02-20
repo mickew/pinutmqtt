@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace NUTDotNetShared
+﻿namespace NUTDotNetShared
 {
     public abstract class AbstractUPS : IEquatable<AbstractUPS>
     {

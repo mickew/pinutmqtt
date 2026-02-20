@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace NUTDotNetClient
 {
@@ -67,7 +68,7 @@ namespace NUTDotNetClient
             disposed = true;
         }
 
-        public void Connect()
+        public async Task ConnectAsync()
         {
             if (IsConnected)
                 throw new InvalidOperationException("Cannot connect while client is still connected.");
@@ -80,15 +81,15 @@ namespace NUTDotNetClient
             };
             streamReader = new StreamReader(client.GetStream(), NUTCommon.PROTO_ENCODING);
             // Verify that the client is allowed access by attempting to get basic data.
-            GetBasicDetails();
+            await GetBasicDetailsAsync();
         }
 
-        public void Disconnect()
+        public async Task DisconnectAsync()
         {
             if (!IsConnected)
                 throw new InvalidOperationException("Cannot disconnect while client is disconnected.");
 
-            SendQuery("LOGOUT");
+            _ = await SendQueryAsync("LOGOUT");
             Username = string.Empty;
             Password = string.Empty;
             streamReader!.Close();
@@ -100,12 +101,14 @@ namespace NUTDotNetClient
         /// Retrieve basic, static details from the NUT server. Also acts to verify that the client is allowed access
         /// to the server, otherwise an access denied error will be returned and we can disconnect.
         /// </summary>
-        void GetBasicDetails()
+        async Task GetBasicDetailsAsync()
         {
             try
             {
-                ServerVersion = SendQuery("VER")[0];
-                ProtocolVersion = SendQuery("NETVER")[0];
+                var serverVersion = await SendQueryAsync("VER");
+                ServerVersion = serverVersion[0];
+                var protocolVersion = await SendQueryAsync("NETVER");
+                ProtocolVersion = protocolVersion[0];
             }
             catch (NUTException nutEx)
             {
@@ -124,11 +127,11 @@ namespace NUTDotNetClient
         /// Queries the server for a list of managed UPSes.
         /// </summary>
         /// <returns>A list of UPS objects found on the server, or an empty list.</returns>
-        public List<ClientUPS> GetUPSes(bool forceUpdate = false)
+        public async Task<List<ClientUPS>> GetUPSesAsync(bool forceUpdate = false)
         {
             if (forceUpdate || upses.Count == 0)
             {
-                List<string> listUpsResponse = SendQuery("LIST UPS");
+                List<string> listUpsResponse = await SendQueryAsync("LIST UPS");
                 foreach (string line in listUpsResponse)
                 {
                     if (line.StartsWith("UPS"))
@@ -150,12 +153,12 @@ namespace NUTDotNetClient
         /// already been set. Reconnect if it needs to be changed.
         /// </summary>
         /// <param name="username"></param>
-        public void SetUsername(string username)
+        public async Task SetUsernameAsync(string username)
         {
             if (!string.IsNullOrEmpty(Username))
                 throw new InvalidOperationException("Cannot change username after it's set. Reconnect and try again.");
-            string response = SendQuery("USERNAME " + username)[0];
-            if (response.Equals("OK"))
+            var response = await SendQueryAsync("USERNAME " + username);
+            if (response[0].Equals("OK"))
                 Username = username;
         }
 
@@ -164,12 +167,12 @@ namespace NUTDotNetClient
         /// are thrown, and the local property is set on success. Cannot change this after it's been set.
         /// </summary>
         /// <param name="password"></param>
-        public void SetPassword(string password)
+        public async Task SetPassword(string password)
         {
             if (!string.IsNullOrEmpty(Password))
                 throw new InvalidOperationException("Cannot change password after it's set. Reconnect and try again.");
-            string response = SendQuery("PASSWORD " + password)[0];
-            if (response.Equals("OK"))
+            var response = await SendQueryAsync("PASSWORD " + password);
+            if (response[0].Equals("OK"))
                 Password = password;
         }
 
@@ -178,15 +181,15 @@ namespace NUTDotNetClient
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public List<string> SendQuery(string query)
+        public async Task<List<string>> SendQueryAsync(string query)
         {
             if (!IsConnected)
                 throw new Exception("Attempted to send a query while disconnected.");
 
-            streamWriter!.WriteLine(query);
-            string readData = streamReader!.ReadLine()!;
+            await streamWriter!.WriteLineAsync(query);
+            string? readData = await streamReader!.ReadLineAsync();
 
-            if (readData == null || readData.Equals(String.Empty))
+            if (string.IsNullOrEmpty(readData))
                 throw new ArgumentException("Unexpected null or empty response returned.");
             if (readData.StartsWith("ERR "))
             {

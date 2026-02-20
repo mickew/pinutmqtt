@@ -1,5 +1,9 @@
-﻿namespace Pinutmqtt.Services;
+﻿using Microsoft.Extensions.Hosting;
+using Pinutmqtt.Models;
 
-internal interface INutUPSClientService
+namespace Pinutmqtt.Services;
+
+internal interface INutUPSClientService : IHostedService
 {
+    Task<UPSStaus> GetUPSStatusAsync(CancellationToken cancellationToken);
 }
